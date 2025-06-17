@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Excel a CSV</title>
+</head>
+<body>
+  <h2>Convertir Excel a CSV</h2>
+  <input type="file" id="input-excel" accept=".xlsx,.xls"/>
+  <button id="btn-generar">Generar CSV</button>
+  <a id="descargar-csv" style="display:none;">Descargar CSV</a>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    let excelData = null;
+
+    document.getElementById('input-excel').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        excelData = XLSX.utils.sheet_to_json(sheet, {header:1});
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    document.getElementById('btn-generar').addEventListener('click', function() {
+      if (!excelData) {
+        alert('Primero selecciona un archivo Excel.');
+        return;
+      }
+      // Selecciona las columnas D (3), F (5), G (6), T (19)
+      const columnas = [3, 5, 6, 19];
+      const csvRows = [];
+      // Encabezados personalizados
+      csvRows.push(['a1', 'a2', 'a3', 'a4'].join(';'));
+      for (let i = 1; i < excelData.length; i++) { // Empieza en 1 para saltar encabezados originales
+        const fila = columnas.map(idx => {
+          let val = (excelData[i][idx] !== undefined && excelData[i][idx] !== null && excelData[i][idx] !== '') ? excelData[i][idx] : 'n/a';
+          return `"${val}"`;
+        });
+        csvRows.push(fila.join(';'));
+      }
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const link = document.getElementById('descargar-csv');
+      link.href = url;
+      link.download = 'resultado.csv';
+      link.style.display = 'inline';
+      link.textContent = 'Descargar CSV';
+    });
+  </script>
+</body>
+</html>
