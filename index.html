@@ -32,11 +32,11 @@
         return;
       }
       // Selecciona las columnas D (3), F (5), G (6), T (19)
-      const columnas = [3, 5, 6, 19];
+      const columnas = [15, 8, 16, 9, 2];
       const csvRows = [];
       // Encabezados personalizados
-      csvRows.push(['a1', 'a2', 'a3', 'a4'].join(';'));
-      for (let i = 1; i < excelData.length; i++) { // Empieza en 1 para saltar encabezados originales
+      csvRows.push(['DNI', 'CONTRATO', 'TIPO DOC', 'KRUK CASE ID', 'BOX'].join(';'));
+      for (let i = 0; i < excelData.length; i++) { // Empieza en 1 para saltar encabezados originales
         const fila = columnas.map(idx => {
           let val = (excelData[i][idx] !== undefined && excelData[i][idx] !== null && excelData[i][idx] !== '') ? excelData[i][idx] : 'n/a';
           return `"${val}"`;
